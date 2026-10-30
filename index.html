@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FC 27 — العب من المتصفح</title>
+<meta name="description" content="بوابة لعب EA SPORTS FC 27 من المتصفح: بث مباشر من جهازك عبر Parsec Web، بدون تحميل أي برنامج على الجهاز اللي بتلعب منه.">
+<meta name="theme-color" content="#0a0f12">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+  :root{
+    --bg:#0a0f12; --panel:#101a1f; --panel2:#16232a; --line:#1f3037;
+    --ink:#e8f2f0; --dim:#8ba2a7; --accent:#7ef29d; --accent2:#4fd1c5;
+    --warn:#ff8a5c; --danger:#ff5d5d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(900px 520px at 82% -8%, #123024 0%, transparent 62%),
+      radial-gradient(760px 460px at -5% 108%, #0e2430 0%, transparent 58%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Noto Naskh Arabic",sans-serif;
+    font-size:15px;line-height:1.6;min-height:100%;padding:22px 20px 54px;
+  }
+  .wrap{max-width:1020px;margin:0 auto}
+  a{color:var(--accent);text-decoration:none}
+
+  header.top{display:flex;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:26px}
+  .logo{
+    width:46px;height:46px;border-radius:13px;flex:0 0 auto;
+    background:linear-gradient(140deg,var(--accent),var(--accent2));
+    display:grid;place-items:center;color:#07201a;font-weight:800;font-size:16px;line-height:1;
+    box-shadow:0 10px 26px -12px var(--accent);letter-spacing:-.3px;
+  }
+  h1{font-size:18px;font-weight:700}
+  h1 span{display:block;color:var(--dim);font-weight:400;font-size:12.5px;letter-spacing:0}
+  .spacer{flex:1}
+  .pill{
+    font-size:11.5px;color:var(--dim);background:var(--panel);border:1px solid var(--line);
+    border-radius:999px;padding:6px 12px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;
+  }
+  .pill i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(126,242,157,.13)}
+  .pill.off i{background:var(--warn);box-shadow:0 0 0 3px rgba(255,138,92,.13)}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;overflow:hidden;border:1px solid var(--line);border-radius:22px;
+    background:linear-gradient(160deg,#0f1c22 0%, #0c161a 55%, #0a1216 100%);
+    padding:38px 34px 30px;margin-bottom:22px;
+  }
+  .hero:before{
+    content:"";position:absolute;inset:-40% -10% auto auto;width:520px;height:520px;border-radius:50%;
+    background:radial-gradient(circle at 50% 50%, rgba(126,242,157,.16), transparent 62%);
+    pointer-events:none;
+  }
+  .kicker{
+    display:inline-flex;align-items:center;gap:8px;font-size:11.5px;letter-spacing:.4px;
+    color:var(--accent);border:1px solid #244035;background:rgba(126,242,157,.06);
+    padding:5px 12px;border-radius:999px;margin-bottom:16px;
+  }
+  .hero h2{font-size:clamp(30px,5.2vw,46px);line-height:1.12;font-weight:800;letter-spacing:-1px;margin-bottom:10px}
+  .hero h2 em{font-style:normal;color:var(--accent)}
+  .hero p{color:#a9bfbb;font-size:14.5px;max-width:58ch}
+  .hero .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;align-items:center}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;border-radius:12px;padding:13px 24px;
+    font:inherit;font-size:15px;font-weight:700;cursor:pointer;border:1px solid transparent;
+    transition:transform .12s ease, box-shadow .18s ease, background .18s;
+  }
+  .btn.primary{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));color:#062018;
+    box-shadow:0 14px 30px -14px var(--accent);
+  }
+  .btn.primary:hover{transform:translateY(-2px);box-shadow:0 18px 34px -14px var(--accent)}
+  .btn.ghost{background:var(--panel2);border-color:#244035;color:var(--ink)}
+  .btn.ghost:hover{background:#1b2e35}
+  .btn small{font-weight:400;opacity:.72;font-size:11.5px}
+
+  .hint{font-size:12px;color:#5c7a72}
+
+  /* ---------- grid ---------- */
+  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+  @media (max-width:820px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}
+  .card h3{font-size:14px;color:var(--accent);margin-bottom:14px;font-weight:700;letter-spacing:.2px}
+
+  ol.steps{list-style:none;counter-reset:s;display:grid;gap:13px}
+  ol.steps li{counter-increment:s;display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:start}
+  ol.steps li:before{
+    content:counter(s);display:grid;place-items:center;width:26px;height:26px;border-radius:8px;
+    background:var(--panel2);border:1px solid #244035;color:var(--accent);font-size:12px;font-weight:700;
+    margin-top:1px;
+  }
+  ol.steps b{display:block;font-size:13.5px;margin-bottom:2px}
+  ol.steps span{font-size:12.5px;color:#93aaa6}
+  kbd{
+    font-family:ui-monospace,Consolas,monospace;font-size:11.5px;background:#1c2c32;
+    border:1px solid #2a4048;border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:#d6e8e3;
+  }
+
+  .fact{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #16262c;font-size:13px}
+  .fact:last-child{border-bottom:0}
+  .fact span{color:var(--dim)}
+  .fact b{font-weight:600;text-align:left;direction:ltr}
+
+  .note{
+    margin-top:14px;padding:13px;border-radius:12px;background:rgba(255,138,92,.06);
+    border:1px solid #4a2f1f;font-size:12.5px;color:#f0c9b6;
+  }
+  .note b{color:#ffb08a}
+
+  .alt{margin-top:18px;display:grid;gap:10px}
+  .alt a{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 16px;
+    font-size:13.5px;color:var(--ink);transition:.16s;
+  }
+  .alt a:hover{border-color:#2e4a41;background:var(--panel2)}
+  .alt a b{font-weight:600}
+  .alt a i{font-style:normal;font-size:11.5px;color:var(--dim);direction:ltr}
+
+  footer{margin-top:34px;text-align:center;font-size:11.5px;color:#42575d;line-height:1.9}
+  footer a{color:#6f8d86}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="logo">FC<br>27</div>
+    <h1>FC 27 — Web Portal
+      <span>بث مباشر من جهازك، واللعب من أي متصفح</span>
+    </h1>
+    <div class="spacer"></div>
+    <div class="pill" id="netPill"><i></i><span>النت شغال</span></div>
+  </header>
+
+  <section class="hero">
+    <div class="kicker">EA SPORTS FC 27 · REMOTE PLAY</div>
+    <h2>افتح الرابط… <em>والعب</em> من المتصفح</h2>
+    <p>
+      اللعبة الحقيقية بتفضل شغالة على جهازك (RTX 4060 Ti)، والصورة بتوصلك في المتصفح.
+      مفيش تحميل ومفيش تثبيت على الجهاز اللي بتلعب منه — لينك وبس، زي مواقع الألعاب
+      اللي بتفتح في تاب.
+    </p>
+    <div class="row">
+      <a class="btn primary" href="https://web.parsec.app" target="_blank" rel="noopener">
+        ▶ افتح اللعبة
+        <small>web.parsec.app</small>
+      </a>
+      <a class="btn ghost" href="./lab/">🎯 Defense Lab</a>
+      <span class="hint">افتحه في <b style="color:#93aaa6">Chrome</b> — على الكمبيوتر أو الأندرويد.</span>
+    </div>
+  </section>
+
+  <div class="grid">
+    <div class="card">
+      <h3>إزاي بتشتغل</h3>
+      <ol class="steps">
+        <li>
+          <div>
+            <b>جهازك شغال وفاتح Parsec</b>
+            <span>سيبه مفتوح ومتسطب عليه Parsec Host. النوم على الكهرباء مقفول عندك، فمش هيعطل.</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <b>من أي جهاز: افتح الرابط + سجّل دخول</b>
+            <span>ادخل بـ <kbd>web.parsec.app</kbd> بنفس حساب Parsec، واختار اسم جهازك من القائمة.</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <b>دوس على أيقونة FC 27 على الديسكتوب</b>
+            <span>هتظهر لك شاشة جهازك جوه التاب. اللعبة بتفتح عادي بالماوس والكيبورد أو الدراع.</span>
+          </div>
+        </li>
+      </ol>
+
+      <div class="note">
+        <b>مهم:</b> البث من جهازك، فجهازك لازم يكون شغال والنت فيه شغال.
+        لو عايز لينك شغال ٢٤ ساعة من غير جهازك → ده بيحتاج سيرفر GPU مستأجر (تفاصيل تحت).
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>حالة الإعداد على الجهاز</h3>
+      <div class="fact"><span>اللعبة</span><b>D:\EA SPORTS FC 27</b></div>
+      <div class="fact"><span>كرت الشاشة</span><b>RTX 4060 Ti · NVENC</b></div>
+      <div class="fact"><span>الدقة الحالية</span><b>1920×1080 @ 60Hz</b></div>
+      <div class="fact"><span>سرعة الرفع</span><b>~20 Mbps</b></div>
+      <div class="fact"><span>Parsec Host</span><b>مثبت وشغال</b></div>
+
+      <div class="alt">
+        <a href="https://web.parsec.app" target="_blank" rel="noopener">
+          <b>Parsec Web — من المتصفح</b><i>web.parsec.app</i>
+        </a>
+        <a href="https://parsec.app/downloads" target="_blank" rel="noopener">
+          <b>تطبيق Parsec — أقل تأخير</b><i>parsec.app</i>
+        </a>
+        <a href="https://play.geforcenow.com" target="_blank" rel="noopener">
+          <b>GeForce NOW — بديل سحابي</b><i>play.geforcenow.com</i>
+        </a>
+        <a href="https://www.xbox.com/play" target="_blank" rel="noopener">
+          <b>Xbox Cloud — Game Pass</b><i>xbox.com/play</i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    الصفحة دي بوابة تشغيل شخصية — مش بتستضيف ملفات اللعبة، والبث من جهازك أنت.<br>
+    EA SPORTS FC 27 علامة تجارية لـ EA — اللعبة لازم تكون مملوكة/licensed عندك.
+    <br><a href="./lab/">Defense Lab</a> · <a href="https://support.parsec.app" target="_blank" rel="noopener">دعم Parsec</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var pill = document.getElementById("netPill");
+  var label = pill.querySelector("span");
+  function paint() {
+    var on = navigator.onLine;
+    pill.className = "pill" + (on ? "" : " off");
+    label.textContent = on ? "النت شغال" : "مفيش نت — البث محتاج اتصال";
+  }
+  window.addEventListener("online", paint);
+  window.addEventListener("offline", paint);
+  paint();
+})();
+</script>
+</body>
+</html>

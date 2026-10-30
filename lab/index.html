@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FC 27 — Defense Lab</title>
+<meta name="description" content="FC 27 Defense Lab — أداة تحضير دفاعي لـ FC 27 تعمل أوفلاين بالكامل من المتصفح.">
+<meta name="theme-color" content="#0a0f12">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FC 27 Lab">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="./icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<style>
+  :root{
+    --bg:#0a0f12;
+    --panel:#101a1f;
+    --panel2:#16232a;
+    --line:#1f3037;
+    --ink:#e8f2f0;
+    --dim:#8ba2a7;
+    --accent:#7ef29d;
+    --accent2:#4fd1c5;
+    --warn:#ff8a5c;
+    --danger:#ff5d5d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(900px 500px at 80% -10%, #123024 0%, transparent 60%),
+      radial-gradient(700px 400px at 0% 110%, #0e2430 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Noto Naskh Arabic",sans-serif;
+    font-size:15px;
+    line-height:1.55;
+    min-height:100%;
+    padding:22px 20px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+
+  header.top{
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .logo{
+    width:44px;height:44px;border-radius:12px;flex:0 0 auto;
+    background:linear-gradient(140deg,var(--accent),var(--accent2));
+    display:grid;place-items:center;color:#07201a;font-weight:800;font-size:19px;
+    box-shadow:0 8px 24px -10px var(--accent);
+  }
+  h1{font-size:19px;font-weight:700;letter-spacing:.2px}
+  h1 span{color:var(--dim);font-weight:400;font-size:13px;display:block;letter-spacing:0}
+  .spacer{flex:1}
+
+  nav.tabs{display:flex;gap:6px;background:var(--panel);padding:5px;border-radius:12px;border:1px solid var(--line)}
+  nav.tabs button{
+    appearance:none;border:0;background:transparent;color:var(--dim);
+    padding:9px 16px;border-radius:8px;cursor:pointer;font:inherit;font-size:14px;
+    transition:.18s;white-space:nowrap;
+  }
+  nav.tabs button:hover{color:var(--ink)}
+  nav.tabs button.on{background:var(--panel2);color:var(--accent);box-shadow:inset 0 0 0 1px #244035}
+
+  section.page{display:none;animation:fade .22s ease-out}
+  section.page.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .grid{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:18px;align-items:start}
+  @media (max-width:860px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;
+  }
+  .card h2{font-size:13px;font-weight:700;color:var(--dim);letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px}
+
+  /* ---------- pitch ---------- */
+  .pitch-wrap{position:relative}
+  .pitch{
+    position:relative;width:100%;aspect-ratio:2/3;
+    background:
+      repeating-linear-gradient(to bottom,#0d2b21 0 8.33%,#0f3226 8.33% 16.66%);
+    border:2px solid #1d4a3a;border-radius:10px;overflow:hidden;
+  }
+  .pitch .line{position:absolute;border:1.5px solid rgba(126,242,157,.28);pointer-events:none}
+  .pitch .half{top:50%;left:0;right:0;height:0;border-width:0;border-top:1.5px solid rgba(126,242,157,.28)}
+  .pitch .circle{
+    width:26%;aspect-ratio:1;border-radius:50%;
+    top:50%;left:50%;transform:translate(-50%,-50%);
+  }
+  .pitch .box-top{top:0;left:50%;transform:translateX(-50%);width:58%;height:16%}
+  .pitch .box-bot{bottom:0;left:50%;transform:translateX(-50%);width:58%;height:16%}
+  .pitch .goal-top{top:0;left:50%;transform:translateX(-50%);width:30%;height:7%}
+  .pitch .goal-bot{bottom:0;left:50%;transform:translateX(-50%);width:30%;height:7%}
+
+  .token{
+    position:absolute;transform:translate(-50%,-50%);
+    width:30px;height:30px;border-radius:50%;
+    display:grid;place-items:center;
+    font-size:11px;font-weight:700;color:#07201a;
+    background:var(--accent);
+    border:2px solid #0a1a14;
+    box-shadow:0 4px 12px -4px #000;
+    transition:left .25s cubic-bezier(.3,1.3,.5,1), top .25s cubic-bezier(.3,1.3,.5,1);
+    cursor:default;
+  }
+  .token.gk{background:#8fb3c9}
+  .token.def{background:#7ef29d}
+  .token.mid{background:#4fd1c5}
+  .token.att{background:#f5c86b}
+  .token small{
+    position:absolute;top:31px;left:50%;transform:translateX(-50%);
+    font-size:8.5px;font-weight:600;color:#a9c4bd;white-space:nowrap;
+    background:rgba(6,14,12,.75);padding:1px 5px;border-radius:5px;
+  }
+  .own-tag{
+    position:absolute;bottom:6px;left:8px;font-size:10px;color:#5d7f74;letter-spacing:1px;
+  }
+  .atk-tag{position:absolute;top:6px;left:8px;font-size:10px;color:#5d7f74;letter-spacing:1px}
+
+  /* ---------- controls ---------- */
+  .field{margin-bottom:14px}
+  .field label{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:6px}
+  .field label b{color:var(--ink);font-variant-numeric:tabular-nums}
+  select,input[type=number],input[type=text]{
+    width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    border-radius:9px;padding:9px 11px;font:inherit;font-size:14px;outline:none;
+  }
+  select:focus,input:focus{border-color:#2f5c4b;box-shadow:0 0 0 3px rgba(126,242,157,.08)}
+  input[type=range]{
+    -webkit-appearance:none;width:100%;height:4px;border-radius:4px;
+    background:#24373c;outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--accent);cursor:pointer;border:2px solid #0a1a14;
+    box-shadow:0 0 0 3px rgba(126,242,157,.14);
+  }
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--dim);
+    padding:7px 12px;border-radius:999px;font:inherit;font-size:12.5px;cursor:pointer;transition:.16s;
+  }
+  .chip:hover{color:var(--ink);border-color:#2f5c4b}
+  .chip.on{background:rgba(126,242,157,.12);color:var(--accent);border-color:#2f5c4b}
+
+  .note{
+    background:var(--panel2);border-right:3px solid var(--accent2);
+    border-radius:8px;padding:11px 13px;font-size:13px;color:#b9cfcb;margin-top:10px;
+  }
+  .note b{color:var(--ink)}
+
+  /* ---------- timer ---------- */
+  .timer-card{display:flex;flex-direction:column;align-items:center;padding:26px 18px}
+  .phase{
+    font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);
+    padding:5px 14px;border-radius:999px;border:1px solid var(--line);margin-bottom:14px;
+  }
+  .phase.work{color:var(--accent);border-color:#2f5c4b;background:rgba(126,242,157,.07)}
+  .phase.rest{color:var(--accent2);border-color:#1f4c52;background:rgba(79,209,197,.07)}
+  .clock{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:76px;font-weight:700;line-height:1;letter-spacing:-2px;
+    font-variant-numeric:tabular-nums;
+  }
+  .clock.work{color:var(--accent);text-shadow:0 0 40px rgba(126,242,157,.25)}
+  .clock.rest{color:var(--accent2);text-shadow:0 0 40px rgba(79,209,197,.18)}
+  .rounds{color:var(--dim);font-size:13px;margin-top:10px;font-variant-numeric:tabular-nums}
+  .btn-row{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;justify-content:center}
+  button.primary,button.ghost{
+    appearance:none;font:inherit;font-size:14px;padding:11px 24px;border-radius:10px;cursor:pointer;
+    border:1px solid transparent;transition:.16s;
+  }
+  button.primary{background:var(--accent);color:#06201a;font-weight:700}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost{background:transparent;border-color:var(--line);color:var(--dim)}
+  button.ghost:hover{color:var(--ink);border-color:#2f5c4b}
+  .mini-inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-top:22px}
+  .mini-inputs div{text-align:center}
+  .mini-inputs span{display:block;font-size:11px;color:var(--dim);margin-bottom:4px}
+
+  /* ---------- log ---------- */
+  .log-grid{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+  @media (max-width:900px){.log-grid{grid-template-columns:1fr}}
+  .row{display:flex;gap:10px;margin-bottom:10px}
+  .row>*{flex:1}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{
+    text-align:right;font-weight:600;font-size:11px;color:var(--dim);
+    letter-spacing:.5px;text-transform:uppercase;padding:7px 8px;border-bottom:1px solid var(--line);
+  }
+  td{padding:9px 8px;border-bottom:1px solid #16242a}
+  tr:hover td{background:#0e181d}
+  .tag{font-size:11px;padding:2px 9px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:#a9c4bd;white-space:nowrap}
+  .tag.left{border-color:#3b2f4d;color:#c3a8e8}
+  .tag.center{border-color:#3b3a24;color:#e0d3a0}
+  .tag.right{border-color:#243b4d;color:#a3c3e0}
+  .del{background:transparent;border:0;color:#5c6f74;cursor:pointer;font-size:15px;padding:0 4px}
+  .del:hover{color:var(--danger)}
+  .empty{color:#586d72;font-size:13px;text-align:center;padding:22px 0}
+
+  .bars{margin-top:6px}
+  .bar-row{margin-bottom:11px}
+  .bar-head{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+  .bar-head b{color:var(--accent);font-variant-numeric:tabular-nums}
+  .bar{height:7px;border-radius:5px;background:#182a2f;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .4s ease}
+  .verdict{
+    margin-top:16px;padding:14px;border-radius:11px;background:rgba(255,138,92,.07);
+    border:1px solid #4a2f1f;font-size:13.5px;color:#f0c9b6;
+  }
+  .verdict b{color:#ffb08a}
+
+  /* ---------- reference ---------- */
+  .ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .ref{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;
+  }
+  .ref h3{font-size:14px;color:var(--accent);margin-bottom:7px;font-weight:700}
+  .ref p{font-size:13px;color:#a9bfbb}
+  .ref ul{margin:7px 0 0 0;padding-right:17px;font-size:13px;color:#a9bfbb}
+  .ref li{margin-bottom:4px}
+  kbd{
+    font-family:ui-monospace,Consolas,monospace;font-size:11.5px;
+    background:#1c2c32;border:1px solid #2a4048;border-bottom-width:2px;
+    border-radius:5px;padding:1px 6px;color:#d6e8e3;
+  }
+  .status{font-size:12px;color:#5c7a72}
+
+  footer{margin-top:30px;text-align:center;font-size:12px;color:#42575d}
+
+  /* ---------- offline / install ---------- */
+  .net{
+    display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--dim);
+    background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 12px;
+    white-space:nowrap;
+  }
+  .net i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(126,242,157,.12);transition:.2s}
+  .net.off i{background:var(--warn);box-shadow:0 0 0 3px rgba(255,138,92,.12)}
+  .net.sync i{background:var(--dim);box-shadow:none;animation:pulse 1.1s infinite}
+  .net.off{color:#f0c9b6;border-color:#4a2f1f}
+  @keyframes pulse{50%{opacity:.3}}
+  .install{
+    appearance:none;border:1px solid #244035;background:var(--panel2);color:var(--accent);
+    font:inherit;font-size:12px;border-radius:999px;padding:6px 13px;cursor:pointer;display:none;
+    transition:.18s;
+  }
+  .install:hover{background:#1b2e35}
+  .install.on{display:inline-flex}
+  @media (max-width:620px){
+    .net span{max-width:120px;overflow:hidden;text-overflow:ellipsis}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="logo">FC</div>
+    <h1>Defense Lab
+      <span>أداة تحضير دفاعي — تعمل خارج اللعبة بالكامل</span>
+    </h1>
+    <div class="spacer"></div>
+    <nav class="tabs">
+      <button data-tab="board" class="on">اللوحة</button>
+      <button data-tab="drill">التمرين</button>
+      <button data-tab="log">سجل الأهداف</button>
+      <button data-tab="ref">المرجع</button>
+    </nav>
+    <div class="net" id="netBadge" title="النسخة محفوظة على جهازك — تفتح بدون نت"><i></i><span>جاري التحضير…</span></div>
+    <button class="install" id="installBtn" type="button">تثبيت على الجهاز</button>
+  </header>
+
+  <!-- ================= BOARD ================= -->
+  <section class="page on" id="tab-board">
+    <div class="grid">
+      <div class="card">
+        <div class="pitch-wrap">
+          <div class="pitch" id="pitch">
+            <div class="line half"></div>
+            <div class="line circle"></div>
+            <div class="line box-top"></div>
+            <div class="line box-bot"></div>
+            <div class="line goal-top"></div>
+            <div class="line goal-bot"></div>
+            <div class="atk-tag">مرمى الخصم</div>
+            <div class="own-tag">مرماك</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>الإعداد</h2>
+
+        <div class="field">
+          <label>التشكيلة <b id="fname">4-2-3-1</b></label>
+          <select id="formation">
+            <option value="4-2-3-1">4-2-3-1</option>
+            <option value="4-3-3">4-3-3</option>
+            <option value="4-4-2">4-4-2</option>
+            <option value="5-3-2">5-3-2</option>
+            <option value="3-5-2">3-5-2</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>العمق الدفاعي (Depth) <b id="depthv">5</b></label>
+          <input type="range" id="depth" min="0" max="10" value="5">
+        </div>
+
+        <div class="field">
+          <label>العرض (Width) <b id="widthv">5</b></label>
+          <input type="range" id="width" min="0" max="10" value="5">
+        </div>
+
+        <div class="field">
+          <label>نمط جاهز</label>
+          <div class="chips" id="presets">
+            <button class="chip" data-p="low">كتلة منخفضة</button>
+            <button class="chip on" data-p="mid">كتلة متوسطة</button>
+            <button class="chip" data-p="high">ضغط عالي</button>
+            <button class="chip" data-p="counter">مضاد للهجمات</button>
+          </div>
+        </div>
+
+        <div class="note" id="presetNote">
+          <b>كتلة متوسطة:</b> خط الدفاع يبدأ من منتصف ملعبك. المسافة بين الدفاع والوسط ١٠-١٥ متر — كافية لتغطية الكرات البينية بدون فتح ظهرك.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DRILL ================= -->
+  <section class="page" id="tab-drill">
+    <div class="grid">
+      <div class="card timer-card">
+        <div class="phase" id="phase">جاهز</div>
+        <div class="clock" id="clock">00:30</div>
+        <div class="rounds" id="rounds">الجولة — / —</div>
+        <div class="btn-row">
+          <button class="primary" id="startBtn">ابدأ</button>
+          <button class="ghost" id="resetBtn">تصفير</button>
+        </div>
+        <div class="mini-inputs">
+          <div><span>شغل (ث)</span><input type="number" id="work" value="30" min="5" max="300"></div>
+          <div><span>راحة (ث)</span><input type="number" id="rest" value="15" min="5" max="180"></div>
+          <div><span>جولات</span><input type="number" id="roundsInput" value="8" min="1" max="40"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>بروتوكول التمرين</h2>
+        <div class="note" style="margin-top:0">
+          <b>الهدف:</b> بناء ذاكرة عضلية للـjockey والـcontain بدل ما تضغط زر التدخل. كل جولة شغل تلعب فيها ٤ ثواني وقفة جانبية، ٤ ثواني تراجع، ٤ ثواني ضغط — بدون أي تدخل.
+        </div>
+
+        <div class="ref-grid" style="margin-top:14px">
+          <div class="ref">
+            <h3>الجولة ١ — الوقفة الجانبية</h3>
+            <p>٢٥ ثانية من الـjockey فقط. لا تدخل، لا sprint. الجسم بين الكرة والمرمى، المسافة ثابتة.</p>
+          </div>
+          <div class="ref">
+            <h3>الجولة ٢ — التراجع المحسوب</h3>
+            <p>تراجع بزاوية ٤٥ درجة وأنت تفتح اللاعب على الجهة الضعيفة عنده. لا ترجع بخط مستقيم.</p>
+          </div>
+          <div class="ref">
+            <h3>الجولة ٣ — التحويل السريع</h3>
+            <p>بدّل اللاعب المسيطر عليه مرتين في الثانية، بدون ما تتحرك من مكانك. التحويل أسرع من الجري.</p>
+          </div>
+          <div class="ref">
+            <h3>الجولة ٤ — التمركز</h3>
+            <p>انظر للمساحة الفاضية مش للكرة. غطِّ العرضية قبل ما تنطلق.</p>
+          </div>
+        </div>
+
+        <div class="note" style="margin-top:14px">
+          <b>القاعدة:</b> ٤ جولات × ٢٠ دقيقة يومياً أفضل من ساعتين مرة في الأسبوع. الذاكرة العضلية تحتاج تكرار متباعد.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LOG ================= -->
+  <section class="page" id="tab-log">
+    <div class="log-grid">
+      <div class="card">
+        <h2>سجّل هدفاً استقبلته</h2>
+
+        <div class="row">
+          <div>
+            <label class="status">الدقيقة</label>
+            <input type="number" id="minute" min="1" max="120" value="1">
+          </div>
+          <div>
+            <label class="status">الجهة</label>
+            <select id="side">
+              <option value="left">اليسار</option>
+              <option value="center" selected>الوسط</option>
+              <option value="right">اليمين</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="status">نوع الهدف</label>
+          <select id="gtype">
+            <option>كرة بينية</option>
+            <option>عرضية / كوت باك</option>
+            <option>هجمة مرتدة</option>
+            <option>كرة ثابتة</option>
+            <option>تسديدة بعيدة</option>
+            <option>مواجهة ١ ضد ١</option>
+            <option>خطأ فردي</option>
+            <option>تمريرة خلف الدفاع</option>
+          </select>
+        </div>
+
+        <button class="primary" id="addGoal" style="width:100%">أضف</button>
+        <button class="ghost" id="clearGoals" style="width:100%;margin-top:8px">مسح الكل</button>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <h2>الأنماط</h2>
+          <div class="bars" id="bars"><div class="empty">لا يوجد بيانات بعد — أضف أهدافاً لتبدأ.</div></div>
+          <div class="verdict" id="verdict" style="display:none"></div>
+        </div>
+
+        <div class="card">
+          <h2>السجل</h2>
+          <div style="max-height:340px;overflow:auto">
+            <table>
+              <thead><tr><th>د</th><th>النوع</th><th>الجهة</th><th></th></tr></thead>
+              <tbody id="goalRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REFERENCE ================= -->
+  <section class="page" id="tab-ref">
+    <div class="ref-grid">
+
+      <div class="ref">
+        <h3>Jockey — الأساس</h3>
+        <p>الـjockey يخلي لاعبك يمشي جانبي مع الخصم بدل ما يقفز للتدخل. هذا هو ٨٠٪ من الدفاع.</p>
+        <ul>
+          <li>لا تضغط sprint وأنت تجوكي — تفقد التوازن</li>
+          <li>جسمك بين الكرة والمرمى، مش بين الكرة واللاعب</li>
+          <li>المسافة المثالية متر ونص — أبعد = مساحة تسديد</li>
+        </ul>
+      </div>
+
+      <div class="ref">
+        <h3>Contain — الضغط المحسوب</h3>
+        <p>الـcontain يخلي زميلك يضغط بينما أنت تغطي التمريرة. استخدمه بدل ما تسحب مدافع ثاني.</p>
+        <ul>
+          <li>لا تستخدمه في الثلث الأخير — يفتح فراغ</li>
+          <li>الأفضل في منتصف الملعب عند بناء لعب الخصم</li>
+          <li>راقب اللاعب الثالث دائماً</li>
+        </ul>
+      </div>
+
+      <div class="ref">
+        <h3>توقيت التدخل</h3>
+        <p>التدخل المفرد (tackle) يُفشل الدفاع إذا جاء متأخر. القاعدة: لا تتدخل إلا لما الخصم يلمس الكرة لمسة ثقيلة.</p>
+        <ul>
+          <li>اللمسة الثقيلة = الكرة تبتعد ١-٢ متر عن قدمه</li>
+          <li>لو هو في الـsprint، احتمالية الخطأ أعلى</li>
+          <li>Standing tackle أأمن من sliding بـ٩٠٪</li>
+        </ul>
+      </div>
+
+      <div class="ref">
+        <h3>العمق (Depth)</h3>
+        <p>كل نقرة على الـdepth ترفع أو تنزل خط الدفاع ٣-٤ أمتار.</p>
+        <ul>
+          <li><kbd>3-4</kbd> ضد فرق سريعة على الأجنحة</li>
+          <li><kbd>5-6</kbd> الافتراضي المتوازن</li>
+          <li><kbd>7+</kbd> فقط لو أنت مسيطر وتملك مدافعين بـpace عالي</li>
+        </ul>
+      </div>
+
+      <div class="ref">
+        <h3>العرض (Width)</h3>
+        <p>العرض العالي يغلق الأجنحة لكن يفتح نصف المساحة. العرض الضيق يسدّ العمق لكن يفتح العرضيات.</p>
+        <ul>
+          <li><kbd>4-5</kbd> ضد فرق تعتمد على العرضيات</li>
+          <li><kbd>6-7</kbd> ضد فرق تلعب بين الخطوط</li>
+          <li>لا ترفعه فوق ٧ — يفتح بينية سهلة</li>
+        </ul>
+      </div>
+
+      <div class="ref">
+        <h3>منع الكوت باك</h3>
+        <p>أكثر هدف يتكرر اونلاين: عرضية أرضية للقادم من الخلف. الحل قبل العرضية مش بعدها.</p>
+        <ul>
+          <li>غطِّ اللاعب القادم من الخلف قبل ما تتحرك للكرة</li>
+          <li>الظهير لازم يكون جوّا الصندوق مش على الخط</li>
+          <li>لو الكرة على الجناح، اضغط بثنين: واحد على الكرة، واحد على القادم</li>
+        </ul>
+      </div>
+
+      <div class="ref">
+        <h3>مضاد الهجمات</h3>
+        <p>لما تخسر الكرة، أول ٣ ثواني تحدد كل شي.</p>
+        <ul>
+          <li>لا تضغط بالمدافعين فوراً — رجّعهم للعمق أولاً</li>
+          <li>استخدم لاعب الوسط للضغط، المدافعين للتغطية</li>
+          <li>خطأ تكتيكي أفضل من هدف — لكن فقط خارج الصندوق</li>
+        </ul>
+      </div>
+
+      <div class="ref">
+        <h3>التحويل بين اللاعبين</h3>
+        <p>أسرع طريقة للتصحيح الدفاعي. التحويل الصحيح يوفر ٢-٣ أمتار.</p>
+        <ul>
+          <li>بدّل باللاعب الأقرب للكرة مش الأقرب للمرمى</li>
+          <li>لا تبدّل أثناء التحام — تخسر التغطية</li>
+          <li>التبديل المزدوج (double tap) يختار اللاعب الأنسب</li>
+        </ul>
+      </div>
+
+      <div class="ref">
+        <h3>قراءة اللاعب</h3>
+        <p>٩٠٪ من الخصوم يلعبون نمط واحد متكرر. اكتشفه في أول ١٥ دقيقة.</p>
+        <ul>
+          <li>لو يكرر العرضية → وسّع الدفاع وانزل بالعمق</li>
+          <li>لو يلعب بينية → نزّل الـdepth وضيّق المسافة</li>
+          <li>لو يعتمد على مهارة فردية → لا تتدخل، جوكي فقط</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>Defense Lab — يعمل محلياً، لا يتصل بأي خدمة ولا يلمس عملية اللعبة.</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- tabs ---------------- */
+  var tabs = document.querySelectorAll("nav.tabs button");
+  var pages = document.querySelectorAll("section.page");
+  tabs.forEach(function (b) {
+    b.addEventListener("click", function () {
+      tabs.forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+      pages.forEach(function (p) {
+        p.classList.toggle("on", p.id === "tab-" + b.dataset.tab);
+      });
+    });
+  });
+
+  /* ---------------- formations ---------------- */
+  // x: 0..100 (left to right), y: 0 at opponent goal, 100 at own goal
+  var FORMATIONS = {
+    "4-2-3-1": [
+      ["GK", 50, 92],
+      ["LB", 12, 74], ["CB", 35, 78], ["CB", 65, 78], ["RB", 88, 74],
+      ["CDM", 38, 60], ["CDM", 62, 60],
+      ["LW", 14, 44], ["CAM", 50, 44], ["RW", 86, 44],
+      ["ST", 50, 24]
+    ],
+    "4-3-3": [
+      ["GK", 50, 92],
+      ["LB", 12, 74], ["CB", 35, 78], ["CB", 65, 78], ["RB", 88, 74],
+      ["CM", 30, 58], ["CM", 50, 62], ["CM", 70, 58],
+      ["LW", 14, 36], ["ST", 50, 26], ["RW", 86, 36]
+    ],
+    "4-4-2": [
+      ["GK", 50, 92],
+      ["LB", 12, 74], ["CB", 35, 78], ["CB", 65, 78], ["RB", 88, 74],
+      ["LM", 12, 54], ["CM", 38, 58], ["CM", 62, 58], ["RM", 88, 54],
+      ["ST", 38, 26], ["ST", 62, 26]
+    ],
+    "5-3-2": [
+      ["GK", 50, 92],
+      ["LWB", 8, 68], ["LCB", 28, 80], ["CB", 50, 82], ["RCB", 72, 80], ["RWB", 92, 68],
+      ["CM", 30, 58], ["CM", 50, 60], ["CM", 70, 58],
+      ["ST", 38, 28], ["ST", 62, 28]
+    ],
+    "3-5-2": [
+      ["GK", 50, 92],
+      ["CB", 28, 80], ["CB", 50, 82], ["CB", 72, 80],
+      ["LWB", 8, 62], ["CM", 32, 58], ["CM", 50, 62], ["CM", 68, 58], ["RWB", 92, 62],
+      ["ST", 38, 28], ["ST", 62, 28]
+    ]
+  };
+
+  var state = { formation: "4-2-3-1", depth: 5, width: 5 };
+  var pitch = document.getElementById("pitch");
+
+  function roleClass(label) {
+    if (label === "GK") return "gk";
+    if (/^(LB|RB|CB|LCB|RCB)$/.test(label)) return "def";
+    if (/^(CDM|CM|CAM|LM|RM)$/.test(label)) return "mid";
+    if (/^(LW|RW|ST|CF|LWB|RWB)$/.test(label)) return "att";
+    return "mid";
+  }
+
+  function render() {
+    // remove old tokens
+    Array.prototype.slice.call(pitch.querySelectorAll(".token")).forEach(function (t) {
+      t.remove();
+    });
+
+    var list = FORMATIONS[state.formation] || [];
+    var depthDelta = (5 - state.depth) * 3.0;   // +depth -> higher line (smaller y)
+    var widthFactor = 1 + (state.width - 5) * 0.06;
+
+    list.forEach(function (p) {
+      var label = p[0], x = p[1], y = p[2];
+
+      if (label !== "GK") {
+        y = y + depthDelta * (y / 100);
+        x = 50 + (x - 50) * widthFactor;
+      }
+      x = Math.max(4, Math.min(96, x));
+      y = Math.max(4, Math.min(96, y));
+
+      var el = document.createElement("div");
+      el.className = "token " + roleClass(label);
+      el.style.left = x + "%";
+      el.style.top = y + "%";
+      el.innerHTML = label.charAt(0).toLowerCase() + "<small>" + label + "</small>";
+      pitch.appendChild(el);
+    });
+  }
+
+  var sel = document.getElementById("formation");
+  var depthInput = document.getElementById("depth");
+  var widthInput = document.getElementById("width");
+
+  sel.addEventListener("change", function () {
+    state.formation = sel.value;
+    document.getElementById("fname").textContent = sel.value;
+    render();
+  });
+  depthInput.addEventListener("input", function () {
+    state.depth = +depthInput.value;
+    document.getElementById("depthv").textContent = state.depth;
+    render();
+  });
+  widthInput.addEventListener("input", function () {
+    state.width = +widthInput.value;
+    document.getElementById("widthv").textContent = state.width;
+    render();
+  });
+
+  /* ---------------- presets ---------------- */
+  var PRESETS = {
+    low: {
+      depth: 2, width: 4,
+      note: "<b>كتلة منخفضة:</b> خط الدفاع داخل ثلثك. تقتل البينية والعمق، لكن تعطي الخصم الاستحواذ — تأكد من سرعة أجنحتك في المرتدات."
+    },
+    mid: {
+      depth: 5, width: 5,
+      note: "<b>كتلة متوسطة:</b> خط الدفاع يبدأ من منتصف ملعبك. المسافة بين الدفاع والوسط ١٠-١٥ متر — كافية لتغطية الكرات البينية بدون فتح ظهرك."
+    },
+    high: {
+      depth: 8, width: 6,
+      note: "<b>ضغط عالي:</b> خط عالي جداً. لا تستخدمه إلا لو مدافعيك pace ٨٥+ وتلعب بضغط مستمر. أي خطأ = ١ ضد ١ على مرماك."
+    },
+    counter: {
+      depth: 4, width: 3,
+      note: "<b>مضاد للهجمات:</b> عمق متوسط مع عرض ضيق جداً. تسدّ العمق وتجبر الخصم على الأطراف، وممتاز ضد من يلعب بينية سريعة."
+    }
+  };
+
+  var presetChips = document.querySelectorAll("#presets .chip");
+  presetChips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      presetChips.forEach(function (c) { c.classList.remove("on"); });
+      chip.classList.add("on");
+      var p = PRESETS[chip.dataset.p];
+      state.depth = p.depth;
+      state.width = p.width;
+      depthInput.value = p.depth;
+      widthInput.value = p.width;
+      document.getElementById("depthv").textContent = p.depth;
+      document.getElementById("widthv").textContent = p.width;
+      document.getElementById("presetNote").innerHTML = p.note;
+      render();
+    });
+  });
+
+  /* ---------------- drill timer ---------------- */
+  var workIn = document.getElementById("work");
+  var restIn = document.getElementById("rest");
+  var roundsIn = document.getElementById("roundsInput");
+  var clockEl = document.getElementById("clock");
+  var phaseEl = document.getElementById("phase");
+  var roundsEl = document.getElementById("rounds");
+  var startBtn = document.getElementById("startBtn");
+  var resetBtn = document.getElementById("resetBtn");
+
+  var drill = {
+    running: false,
+    phase: "idle",     // idle | work | rest | done
+    round: 1,
+    remaining: 30,
+    deadline: 0,
+    tick: null
+  };
+
+  function beep(freq, dur) {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!beep.ctx) beep.ctx = new AC();
+      var ctx = beep.ctx;
+      if (ctx.state === "suspended") ctx.resume();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + dur + 0.02);
+    } catch (e) { /* audio unavailable */ }
+  }
+
+  function fmt(sec) {
+    sec = Math.max(0, Math.ceil(sec));
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  function paint() {
+    clockEl.textContent = fmt(drill.remaining);
+    clockEl.className = "clock" + (drill.phase === "work" ? " work" :
+                        drill.phase === "rest" ? " rest" : "");
+    phaseEl.className = "phase" + (drill.phase === "work" ? " work" :
+                        drill.phase === "rest" ? " rest" : "");
+    if (drill.phase === "idle") {
+      phaseEl.textContent = "جاهز";
+      roundsEl.textContent = "الجولة — / —";
+    } else if (drill.phase === "done") {
+      phaseEl.textContent = "خلصت";
+      roundsEl.textContent = "أكملت " + roundsIn.value + " جولات";
+    } else {
+      phaseEl.textContent = drill.phase === "work" ? "شغل" : "راحة";
+      roundsEl.textContent = "الجولة " + drill.round + " / " + roundsIn.value;
+    }
+    startBtn.textContent = drill.running ? "إيقاف" : (drill.phase === "done" ? "من جديد" : "ابدأ");
+  }
+
+  function stopTicking() {
+    if (drill.tick) { clearInterval(drill.tick); drill.tick = null; }
+  }
+
+  function startTicking() {
+    stopTicking();
+    drill.deadline = Date.now() + drill.remaining * 1000;
+    drill.tick = setInterval(function () {
+      drill.remaining = (drill.deadline - Date.now()) / 1000;
+      if (drill.remaining <= 0) {
+        advance();
+      } else {
+        paint();
+      }
+    }, 100);
+  }
+
+  function advance() {
+    if (drill.phase === "work") {
+      if (drill.round >= (+roundsIn.value || 1)) {
+        drill.phase = "done";
+        drill.running = false;
+        drill.remaining = 0;
+        stopTicking();
+        beep(660, 0.35);
+        setTimeout(function () { beep(440, 0.5); }, 220);
+        paint();
+        return;
+      }
+      drill.phase = "rest";
+      drill.remaining = +restIn.value || 15;
+      beep(440, 0.18);
+    } else if (drill.phase === "rest") {
+      drill.round++;
+      drill.phase = "work";
+      drill.remaining = +workIn.value || 30;
+      beep(880, 0.18);
+    }
+    drill.deadline = Date.now() + drill.remaining * 1000;
+    paint();
+  }
+
+  startBtn.addEventListener("click", function () {
+    if (drill.running) {
+      drill.running = false;
+      stopTicking();
+      paint();
+      return;
+    }
+    if (drill.phase === "idle" || drill.phase === "done") {
+      drill.round = 1;
+      drill.phase = "work";
+      drill.remaining = +workIn.value || 30;
+      beep(880, 0.18);
+    }
+    drill.running = true;
+    startTicking();
+    paint();
+  });
+
+  resetBtn.addEventListener("click", function () {
+    drill.running = false;
+    drill.phase = "idle";
+    drill.round = 1;
+    drill.remaining = +workIn.value || 30;
+    stopTicking();
+    paint();
+  });
+
+  [workIn, restIn, roundsIn].forEach(function (inp) {
+    inp.addEventListener("input", function () {
+      if (drill.phase === "idle" || drill.phase === "done") {
+        drill.remaining = +workIn.value || 30;
+        paint();
+      }
+    });
+  });
+
+  /* ---------------- goals log ---------------- */
+  var KEY = "fc27.defenselab.goals";
+  var goals = [];
+  try {
+    goals = JSON.parse(localStorage.getItem(KEY) || "[]");
+    if (!Array.isArray(goals)) goals = [];
+  } catch (e) { goals = []; }
+
+  var tbody = document.getElementById("goalRows");
+  var barsEl = document.getElementById("bars");
+  var verdictEl = document.getElementById("verdict");
+
+  var SIDE_AR = { left: "اليسار", center: "الوسط", right: "اليمين" };
+
+  var ADVICE = {
+    "كرة بينية": "أكبر مشكلة عندك هي البينية. نزّل الـDepth ٢ نقرات وقلل عرض الدفاع. لو الخصم يلعبها من العمق، استخدم CDM واحد بـ<kbd>stay back</kbd> دائماً.",
+    "عرضية / كوت باك": "الكوت باك يقتلك. ظهيريك لازم يكونون جوّا الصندوق مش على الخط، وغطِّ القادم من الخلف قبل الكرة. ارفع الـWidth نقرة.",
+    "هجمة مرتدة": "خسارة الكرة تحولت لأهداف. أول ٣ ثواني بعد الفقدان: رجّع المدافعين، اضغط بلاعب الوسط فقط. لا تسحب مدافع من مكانه أبداً.",
+    "كرة ثابتة": "الأهداف من الكرات الثابتة مش عبث. غطِّ القادم من الخلف ووقف على الخط قبل الركلة، مش بعدها.",
+    "تسديدة بعيدة": "الخصم يلقى مساحة تسديد. الـcontain من مسافة صح يحل هذا — لا تتراجع للصندوق وتترك المساحة قدامك.",
+    "مواجهة ١ ضد ١": "مدافعك يُترك وحده كثير. هذا يعني خط دفاع مكشوف — نزّل الـDepth وقلل الـWidth، واستخدم contain بدل التقدّم.",
+    "خطأ فردي": "أخطاء فردية = قرارات متسرعة. توقف عن التدخل. جوكي فقط لمباراتين كاملتين، وشوف الفرق.",
+    "تمريرة خلف الدفاع": "خطك عالي أكثر من اللازم. نزّل العمق فوراً — أي مدافع بـpace أقل من ٨٠ ما ينفع بخط عالي."
+  };
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(goals)); } catch (e) {}
+  }
+
+  function renderLog() {
+    tbody.innerHTML = "";
+    if (!goals.length) {
+      tbody.innerHTML = '<tr><td colspan="4"><div class="empty">ما فيه أهداف مسجلة.</div></td></tr>';
+    } else {
+      goals.slice().sort(function (a, b) { return a.minute - b.minute; }).forEach(function (g) {
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td>" + g.minute + "'</td>" +
+          "<td>" + g.type + "</td>" +
+          '<td><span class="tag ' + g.side + '">' + (SIDE_AR[g.side] || g.side) + "</span></td>" +
+          '<td><button class="del" data-id="' + g.id + '" title="حذف">×</button></td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    // bars
+    if (!goals.length) {
+      barsEl.innerHTML = '<div class="empty">لا يوجد بيانات بعد — أضف أهدافاً لتبدأ.</div>';
+      verdictEl.style.display = "none";
+      return;
+    }
+
+    var counts = {};
+    goals.forEach(function (g) { counts[g.type] = (counts[g.type] || 0) + 1; });
+    var sorted = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
+    var max = counts[sorted[0]];
+    var total = goals.length;
+
+    barsEl.innerHTML = "";
+    sorted.forEach(function (t) {
+      var pct = Math.round((counts[t] / max) * 100);
+      var row = document.createElement("div");
+      row.className = "bar-row";
+      row.innerHTML =
+        '<div class="bar-head"><span>' + t + "</span><b>" + counts[t] + " / " + total + "</b></div>" +
+        '<div class="bar"><i style="width:' + pct + '%"></i></div>';
+      barsEl.appendChild(row);
+    });
+
+    var top = sorted[0];
+    verdictEl.style.display = "block";
+    verdictEl.innerHTML = "<b>أكبر نمط عندك: " + top + " (" +
+      Math.round((counts[top] / total) * 100) + "٪).</b><br>" +
+      (ADVICE[top] || "كرر هذا النوع في التدريب وغطِّه في المباراة القادمة.");
+  }
+
+  document.getElementById("addGoal").addEventListener("click", function () {
+    var minute = Math.max(1, Math.min(120, parseInt(document.getElementById("minute").value, 10) || 1));
+    var type = document.getElementById("gtype").value;
+    var side = document.getElementById("side").value;
+
+    goals.push({ id: Date.now() + "-" + Math.random().toString(36).slice(2, 7), minute: minute, type: type, side: side });
+    save();
+    renderLog();
+
+    document.getElementById("minute").value = Math.min(120, minute + 1);
+  });
+
+  document.getElementById("clearGoals").addEventListener("click", function () {
+    if (!goals.length) return;
+    goals = [];
+    save();
+    renderLog();
+  });
+
+  tbody.addEventListener("click", function (e) {
+    var btn = e.target.closest(".del");
+    if (!btn) return;
+    var id = btn.dataset.id;
+    goals = goals.filter(function (g) { return String(g.id) !== String(id); });
+    save();
+    renderLog();
+  });
+
+  /* ---------------- init ---------------- */
+  render();
+  paint();
+  renderLog();
+})();
+</script>
+<script>
+/* ---------- offline (PWA) : لا يحتاج نت بعد أول فتحة ---------- */
+(function () {
+  var badge = document.getElementById("netBadge");
+  var installBtn = document.getElementById("installBtn");
+  var deferred = null;
+
+  function setNet(mode) {
+    if (!badge) return;
+    var label = badge.querySelector("span");
+    if (!navigator.onLine) {
+      badge.className = "net off";
+      label.textContent = "أوفلاين — شغّال";
+      badge.title = "النت مقطوع والنسخة المحفوظة على جهازك شغالة";
+    } else if (mode === "sync") {
+      badge.className = "net sync";
+      label.textContent = "جاري الحفظ…";
+      badge.title = "بنجهّز النسخة الأوفلاين";
+    } else if (mode === "off") {
+      badge.className = "net off";
+      label.textContent = "أوفلاين غير متاح";
+      badge.title = "المتصفح ده مش بيدعم التخزين الأوفلاين — استخدم Chrome أو Edge أو Safari";
+    } else {
+      badge.className = "net";
+      label.textContent = "أوفلاين جاهز";
+      badge.title = "اتحفظ على جهازك — افتحه في أي وقت بدون نت";
+    }
+  }
+
+  function boot() {
+    if (!("serviceWorker" in navigator)) { setNet("off"); return; }
+    navigator.serviceWorker.register("./sw.js", { scope: "./" }).then(function (reg) {
+      if (navigator.serviceWorker.controller) { setNet("ok"); return; }
+      var worker = reg.installing || reg.waiting || reg.active;
+      if (worker && worker.state === "activated") { setNet("ok"); return; }
+      setNet("sync");
+      navigator.serviceWorker.addEventListener("controllerchange", function () { setNet("ok"); });
+      setTimeout(function () { if (navigator.serviceWorker.controller) setNet("ok"); }, 2500);
+    }).catch(function () { setNet("off"); });
+  }
+
+  window.addEventListener("online", function () { setNet("ok"); });
+  window.addEventListener("offline", function () { setNet("off"); });
+
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    deferred = e;
+    if (installBtn) installBtn.classList.add("on");
+  });
+  if (installBtn) {
+    installBtn.addEventListener("click", function () {
+      if (!deferred) return;
+      deferred.prompt();
+      deferred = null;
+      installBtn.classList.remove("on");
+    });
+  }
+  window.addEventListener("appinstalled", function () {
+    if (installBtn) installBtn.classList.remove("on");
+  });
+
+  setNet("sync");
+  if (document.readyState === "complete") boot();
+  else window.addEventListener("load", boot);
+})();
+</script>
+</body>
+</html>

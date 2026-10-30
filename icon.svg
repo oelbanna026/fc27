@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="FC 27">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7ef29d"/>
+      <stop offset="1" stop-color="#4fd1c5"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <text x="32" y="35" text-anchor="middle" textlength="40" lengthAdjust="spacingAndGlyphs"
+        font-family="Segoe UI, Arial, Helvetica, sans-serif" font-weight="700" font-size="27"
+        fill="#07201a">FC</text>
+  <text x="32" y="53" text-anchor="middle"
+        font-family="Segoe UI, Arial, Helvetica, sans-serif" font-weight="600" font-size="14"
+        fill="#07201a" opacity=".82">27</text>
+</svg>

@@ -1,0 +1,35 @@
+{
+  "name": "FC 27 — Defense Lab",
+  "short_name": "FC 27 Lab",
+  "description": "أداة تحضير دفاعي لـ FC 27 — تعمل أوفلاين بالكامل من المتصفح.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "background_color": "#0a0f12",
+  "theme_color": "#0a0f12",
+  "categories": ["sports", "productivity"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
